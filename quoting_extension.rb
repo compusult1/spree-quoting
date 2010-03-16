@@ -40,12 +40,14 @@ class QuotingExtension < Spree::Extension
 
       named_scope :quote_complete, {:include => :quote, :conditions => ["quotes.completed_at IS NOT NULL"]}
 
-      state_machines['state'].after_transition :to => 'quote', :do => :complete_quote
-      state_machines['state'].event :save_as_quote do
-        transition :from => 'in_progress', :to => 'quote'
-      end
-      state_machines['state'].event :complete do
-        transition :to => 'new', :from => 'quote'
+      Order.state_machines[:state] = StateMachine::Machine.new(Order, :initial => 'in_progress') do
+        after_transition :to => 'quote', :do => :complete_quote
+        event :save_as_quote do
+          transition :from => 'in_progress', :to => 'quote'
+        end
+        event :complete do
+          transition :from => 'new', :from => 'quote'
+        end
       end
 
       def quote_complete
