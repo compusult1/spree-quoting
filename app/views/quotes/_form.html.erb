@@ -1,0 +1,17 @@
+<% content_for :head do %>
+  <%= javascript_tag "var AUTH_TOKEN = #{form_authenticity_token.inspect};" if protect_against_forgery? %> 
+  <script type="text/javascript">
+    var regions = new Array(<%= quote_steps.collect {|step| "\'#{step}\'"}.join(",") %>);
+  </script>
+<% end %>                 
+
+<%= error_messages_for :quote %>
+
+<% quote_steps.each do |step| %>
+  <div id="<%=step%>" class="checkout disabled">
+    <%= render step, :quote_form => quote_form %>  
+  </div>
+<% end %>
+
+<input type="hidden" id="hidden_bcountry" name="hidden_bcountry" value="<%= @quote.bill_address.country_id %>" />
+<input type="hidden" id="hidden_bstate" name="hidden_bstate" value="<%= @quote.bill_address.country.states.empty? ? @quote.bill_address.state_name : @quote.bill_address.state_id %>" />
